@@ -16,31 +16,63 @@ import javax.swing.JPanel;
 
 public class Drawing2_1 extends JPanel {
 	public BufferedImage img;
-	public DrawingListener dl;
 	public Graphics2D g;
+	private JFrame frame;
+	private JButton[] buttons;
+	private JComboBox<String> faceCombo;
+	public DrawingListener dl = new DrawingListener(this);
 
 	public static void main(String[] args) {
 		Drawing2_1 draw = new Drawing2_1();
-		draw.initUI();
+		draw.init();
 	}
 
-	public void initUI() {
-		// 窗体基本设置
-		JFrame frame = new JFrame("Kevin之创意画板");
+	public void init() {
+		frame = new JFrame("Kevin之创意画板");
 		frame.setSize(750, 500);
 		frame.setLocationRelativeTo(null);// 使窗体位于屏幕中央
 		frame.setDefaultCloseOperation(3);// 窗体关闭方式
-		frame.setLayout(new BorderLayout());// 设置窗体的布局方式为流式布局
+		frame.setLayout(new BorderLayout());// 设置窗体的布局方式为边界布局
 
-		// 添加工具 面板
-		JPanel panel_op = new JPanel();
+		initLeftPanel();// 初始化左边面板区
+		initSouthPanel();// 初始化下面取色区
+
+		this.setBackground(Color.white);
+		frame.add(this);
+		frame.setVisible(true);
+
+		this.addMouseListener(dl);
+		// 给事件源对象添加鼠标移动动作监听方法，指定事件处理类对象为dl。
+		this.addMouseMotionListener(dl);
+	}
+
+	public void initSouthPanel() {
 		JPanel panel_south = new JPanel();
 		JLabel label = new JLabel("取色：");
-		panel_op.setPreferredSize(new Dimension(90, 0));
-		panel_op.setLayout(new GridLayout(15, 1));
+		JButton[] button = { new JButton(), new JButton(), new JButton(),
+				new JButton() };// 颜色按钮
+		// 定义数组，用来存储按钮上要显示的颜色信息
+		Color[] color_Array = { Color.black, Color.red, Color.GREEN, Color.BLUE };
 
-		// 添加选项按钮(盒)
-		JComboBox<String> faceCombo = new JComboBox<>();
+		panel_south.add(label);
+		for (int i = 0; i < color_Array.length; i++) {
+			button[i].setBackground(color_Array[i]);// 设置按钮上要显示的背景颜色
+			button[i].setPreferredSize(new Dimension(15, 15));
+			panel_south.add(button[i]);
+			// 给事件源对象添加动作监听方法，指定事件处理类对象为dl.
+			button[i].addActionListener(dl);
+		}
+		frame.add(panel_south, BorderLayout.SOUTH);
+		panel_south.setBackground(new Color(218, 224, 241));
+		panel_south.setPreferredSize(new Dimension(0, 20));
+	}
+
+	public void initLeftPanel() {
+		JPanel panel_left = new JPanel();
+		panel_left.setPreferredSize(new Dimension(90, 0));
+		panel_left.setLayout(new GridLayout(15, 1));
+
+		faceCombo = new JComboBox<>();
 		faceCombo.setEditable(true);// 使之可编辑
 		faceCombo.setEnabled(true);
 
@@ -49,66 +81,24 @@ public class Drawing2_1 extends JPanel {
 		for (int i = 0; i < Array.length; i++) {
 			faceCombo.addItem(Array[i]);
 		}
-		panel_op.add(faceCombo);
+		panel_left.add(faceCombo);
+		faceCombo.addActionListener(dl);
 
 		// 工具按钮
-
-		// JButton button1[] = new JButton[Array.length];
-		JButton[] button1 = { new JButton("橡皮擦"), new JButton("清屏"),
+		buttons = new JButton[] { new JButton("橡皮擦"), new JButton("清屏"),
 				new JButton("导入图片"), new JButton("1"), new JButton("3"),
 				new JButton("5") };
-		JButton[] button2 = { new JButton(), new JButton(), new JButton(),
-				new JButton(), new JButton() };// 颜色按钮
-		// 定义数组，用来存储按钮上要显示的颜色信息
-		Color[] color_Array = { Color.black, Color.red, Color.GREEN, Color.BLUE };
-		for (int i = 0; i < button1.length; i++) {// 重复的批量操作需要用到数组
-			button1[i].setBackground(Color.cyan);
+		for (int i = 0; i < buttons.length; i++) {// 重复的批量操作需要用到数组
+			buttons[i].setBackground(Color.cyan);
 			// button1[i].setContentAreaFilled(false); // 设置按钮透明度(方法二)， 只须加上此句
-			panel_op.add(button1[i]);
-		}
-
-		panel_south.add(label);
-		for (int i = 0; i < color_Array.length; i++) {
-			button2[i].setBackground(color_Array[i]);// 设置按钮上要显示的背景颜色
-			button2[i].setPreferredSize(new Dimension(15, 15));
-			panel_south.add(button2[i]);
-		}
-		frame.add(panel_op, BorderLayout.WEST);
-		frame.add(panel_south, BorderLayout.SOUTH);
-		// panel_op.add("SOUTH", panel_south);//frame不能用
-
-		frame.add(this);
-		panel_op.setBackground(new Color(220, 240, 230));
-		panel_south.setBackground(new Color(218, 224, 241));
-		panel_south.setPreferredSize(new Dimension(0, 20));
-		this.setBackground(Color.white);
-		frame.setVisible(true);
-		dl = new DrawingListener(this, faceCombo);
-
-		for (int i = 0; i < button1.length; i++) {
+			panel_left.add(buttons[i]);
 			// 给事件源对象添加动作监听方法，指定事件处理类对象为dl.
-			button1[i].addActionListener(dl);
+			buttons[i].addActionListener(dl);
 		}
-		for (int i = 0; i < button2.length; i++) {
-			// 给事件源对象添加动作监听方法，指定事件处理类对象为dl.
-			button2[i].addActionListener(dl);
-		}
-		// System.out.println(Math.cos(90));
-		faceCombo.addActionListener(dl);
-		this.addMouseListener(dl);
-		// 给事件源对象添加鼠标移动动作监听方法，指定事件处理类对象为dl。
-		this.addMouseMotionListener(dl);
-
+		panel_left.setBackground(new Color(220, 240, 230));
+		frame.add(panel_left, BorderLayout.WEST);
 	}
 
-	// a坐标=（x-y*sin72,y*(1-sin28)）
-	// c坐标=（x,0）
-	// e坐标=（x+y*sin72,y*(1-sin28) )
-	// g坐标=（x+y*sin36,y*(1+sin54)）%
-	// i坐标=（x-y*sin36,y*(1+sin54)）
-	// j坐标=（x-(1-sin28)*tan28,y(1-sin28) )
-	// b坐标=（x+(1-sin28)*tan28,y(1-sin28) )
-	// 同理求出d、f、h坐标
 	/**
 	 * 重写JFrame的重绘方法
 	 */
